@@ -46,7 +46,7 @@ app.post('/:username/:platform/:leagueId/leagueteams', (req, res) => {
     });
 });
 
-app.post('/:username/:platform/:leagueId/standings', (req, res) => {
+app.post('/ps4/3366872/standings', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     let body = '';
