@@ -59,7 +59,7 @@ app.post('/:username/:platform/:leagueId/standings', (req, res) => {
 
         teams.forEach(team => {
             const teamRef = ref.child(
-                `data/${username}/${leagueId}/teams/${team.teamId}`
+                `${username}/${leagueId}/teams/${team.teamId}`
             );
             teamRef.update(team);
         });
