@@ -35,7 +35,7 @@ app.post('/:username/:platform/:leagueId', (req, res) => {
     });
     req.on('end', () => {
         const responseBody = { body };
-        console.log(responseBody);
+        console.log(JSON.parse(body));
         /*res.write(JSON.stringify(JSON.parse(body)));
         res.end();*/
         //const { leagueTeamInfoList: teams } = JSON.parse(body);
