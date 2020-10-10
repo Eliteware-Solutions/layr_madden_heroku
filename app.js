@@ -26,7 +26,31 @@ app.get('*', (req, res) => {
     res.send('Madden Companion Exporter');
 });
 
-app.post('/:username/:platform/:leagueId/leagueteams', (req, res) => {
+app.post('/:username/:platform/:leagueId', (req, res) => {
+    const db = admin.database();
+    const ref = db.ref();
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        const responseBody = { body };
+        console.log(JSON.parse(body));
+        /*res.write(JSON.stringify(JSON.parse(body)));
+        res.end();*/
+        //const { leagueTeamInfoList: teams } = JSON.parse(body);
+        //const {params: { username, leagueId }} = req;
+
+        /*teams.forEach(team => {
+            const teamRef = ref.child(`data/${username}/${leagueId}/teams/${team.teamId}`);
+            teamRef.update(team);
+        });
+
+        res.sendStatus(200);*/
+    });
+});
+
+/*app.post('/:username/:platform/:leagueId/leagueteams', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     let body = '';
@@ -44,9 +68,9 @@ app.post('/:username/:platform/:leagueId/leagueteams', (req, res) => {
 
         res.sendStatus(200);
     });
-});
+});*/
 
-app.post('/:username/:platform/:leagueId/standings', (req, res) => {
+/*app.post('/:username/:platform/:leagueId/standings', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     let body = '';
@@ -59,22 +83,20 @@ app.post('/:username/:platform/:leagueId/standings', (req, res) => {
 
         teams.forEach(team => {
             const teamRef = ref.child(
-                `${username}/${leagueId}/teams/${team.teamId}`
+                `data/${username}/${leagueId}/teams/${team.teamId}`
             );
             teamRef.update(team);
         });
 
         res.sendStatus(200);
     });
-});
+});*/
 
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-app.post(
-    '/:username/:platform/:leagueId/week/:weekType/:weekNumber/:dataType',
-    (req, res) => {
+/*app.post('/:username/:platform/:leagueId/week/:weekType/:weekNumber/:dataType', (req, res) => {
         const db = admin.database();
         const ref = db.ref();
         const {
@@ -135,10 +157,10 @@ app.post(
             res.sendStatus(200);
         });
     }
-);
+);*/
 
 // ROSTERS
-app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
+/*app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     const {
@@ -166,9 +188,9 @@ app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
         });
         res.sendStatus(200);
     });
-});
+});*/
 
-app.post('/:username/:platform/:leagueId/team/:teamId/roster', (req, res) => {
+/*app.post('/:username/:platform/:leagueId/team/:teamId/roster', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     const {
@@ -196,7 +218,7 @@ app.post('/:username/:platform/:leagueId/team/:teamId/roster', (req, res) => {
         });
         res.sendStatus(200);
     });
-});
+});*/
 
 app.listen(app.get('port'), () =>
     console.log('Madden Data is running on port', app.get('port'))
