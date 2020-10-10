@@ -26,7 +26,7 @@ app.get('*', (req, res) => {
     res.send('Madden Companion Exporter');
 });
 
-app.post('/:username/:platform/:leagueId', (req, res) => {
+/*app.post('/:username/:platform/:leagueId', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     let body = '';
@@ -36,19 +36,19 @@ app.post('/:username/:platform/:leagueId', (req, res) => {
     req.on('end', () => {
         const responseBody = { body };
         console.log(JSON.parse(body));
-        /*res.write(JSON.stringify(JSON.parse(body)));
-        res.end();*/
+        // res.write(JSON.stringify(JSON.parse(body)));
+        // res.end();
         //const { leagueTeamInfoList: teams } = JSON.parse(body);
         //const {params: { username, leagueId }} = req;
 
-        /*teams.forEach(team => {
-            const teamRef = ref.child(`data/${username}/${leagueId}/teams/${team.teamId}`);
-            teamRef.update(team);
-        });
-
-        res.sendStatus(200);*/
+        // teams.forEach(team => {
+        //     const teamRef = ref.child(`data/${username}/${leagueId}/teams/${team.teamId}`);
+        //     teamRef.update(team);
+        // });
+        //
+        // res.sendStatus(200);
     });
-});
+});*/
 
 app.post('/:username/:platform/:leagueId/leagueteams', (req, res) => {
     const db = admin.database();
@@ -60,7 +60,7 @@ app.post('/:username/:platform/:leagueId/leagueteams', (req, res) => {
     req.on('end', () => {
         const responseBody = { body };
         console.log(JSON.parse(body));
-        /*const { leagueTeamInfoList: teams } = JSON.parse(body);
+        const { leagueTeamInfoList: teams } = JSON.parse(body);
         const {params: { username, leagueId }} = req;
 
         teams.forEach(team => {
@@ -68,7 +68,7 @@ app.post('/:username/:platform/:leagueId/leagueteams', (req, res) => {
             teamRef.update(team);
         });
 
-        res.sendStatus(200);*/
+        res.sendStatus(200);
     });
 });
 
@@ -82,7 +82,7 @@ app.post('/:username/:platform/:leagueId/standings', (req, res) => {
     req.on('end', () => {
         const responseBody = { body };
         console.log(JSON.parse(body));
-        /*const { teamStandingInfoList: teams } = JSON.parse(body);
+        const { teamStandingInfoList: teams } = JSON.parse(body);
         const {params: { username, leagueId }} = req;
 
         teams.forEach(team => {
@@ -92,7 +92,7 @@ app.post('/:username/:platform/:leagueId/standings', (req, res) => {
             teamRef.update(team);
         });
 
-        res.sendStatus(200);*/
+        res.sendStatus(200);
     });
 });
 
@@ -116,7 +116,7 @@ app.post('/:username/:platform/:leagueId/week/:weekType/:weekNumber/:dataType', 
         req.on('end', () => {
             const responseBody = { body };
             console.log(JSON.parse(body));
-            /*switch (dataType) {
+            switch (dataType) {
                 case 'schedules': {
                     const weekRef = ref.child(
                         `${basePath}schedules/${weekType}/${weekNumber}`
@@ -160,7 +160,7 @@ app.post('/:username/:platform/:leagueId/week/:weekType/:weekNumber/:dataType', 
                 }
             }
 
-            res.sendStatus(200);*/
+            res.sendStatus(200);
         });
     }
 );
@@ -179,7 +179,7 @@ app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
     req.on('end', () => {
         const responseBody = { body };
         console.log(JSON.parse(body));
-        /*const { rosterInfoList } = JSON.parse(body);
+        const { rosterInfoList } = JSON.parse(body);
         const dataRef = ref.child(
             `data/${username}/${leagueId}/freeagents`
         );
@@ -194,7 +194,7 @@ app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
                 console.log('Data saved successfully.');
             }
         });
-        res.sendStatus(200);*/
+        res.sendStatus(200);
     });
 });
 
@@ -211,7 +211,7 @@ app.post('/:username/:platform/:leagueId/team/:teamId/roster', (req, res) => {
     req.on('end', () => {
         const responseBody = { body };
         console.log(JSON.parse(body));
-        /*const { rosterInfoList } = JSON.parse(body);
+        const { rosterInfoList } = JSON.parse(body);
         const dataRef = ref.child(
             `data/${username}/${leagueId}/teams/${teamId}/roster`
         );
@@ -226,7 +226,7 @@ app.post('/:username/:platform/:leagueId/team/:teamId/roster', (req, res) => {
                 console.log('Data saved successfully.');
             }
         });
-        res.sendStatus(200);*/
+        res.sendStatus(200);
     });
 });
 
