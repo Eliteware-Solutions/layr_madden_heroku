@@ -50,7 +50,7 @@ app.post('/:username/:platform/:leagueId', (req, res) => {
     });
 });
 
-/*app.post('/:username/:platform/:leagueId/leagueteams', (req, res) => {
+app.post('/:username/:platform/:leagueId/leagueteams', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     let body = '';
@@ -58,7 +58,9 @@ app.post('/:username/:platform/:leagueId', (req, res) => {
         body += chunk.toString();
     });
     req.on('end', () => {
-        const { leagueTeamInfoList: teams } = JSON.parse(body);
+        const responseBody = { body };
+        console.log(JSON.parse(body));
+        /*const { leagueTeamInfoList: teams } = JSON.parse(body);
         const {params: { username, leagueId }} = req;
 
         teams.forEach(team => {
@@ -66,11 +68,11 @@ app.post('/:username/:platform/:leagueId', (req, res) => {
             teamRef.update(team);
         });
 
-        res.sendStatus(200);
+        res.sendStatus(200);*/
     });
-});*/
+});
 
-/*app.post('/:username/:platform/:leagueId/standings', (req, res) => {
+app.post('/:username/:platform/:leagueId/standings', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     let body = '';
@@ -78,7 +80,9 @@ app.post('/:username/:platform/:leagueId', (req, res) => {
         body += chunk.toString();
     });
     req.on('end', () => {
-        const { teamStandingInfoList: teams } = JSON.parse(body);
+        const responseBody = { body };
+        console.log(JSON.parse(body));
+        /*const { teamStandingInfoList: teams } = JSON.parse(body);
         const {params: { username, leagueId }} = req;
 
         teams.forEach(team => {
@@ -88,15 +92,15 @@ app.post('/:username/:platform/:leagueId', (req, res) => {
             teamRef.update(team);
         });
 
-        res.sendStatus(200);
+        res.sendStatus(200);*/
     });
-});*/
+});
 
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-/*app.post('/:username/:platform/:leagueId/week/:weekType/:weekNumber/:dataType', (req, res) => {
+app.post('/:username/:platform/:leagueId/week/:weekType/:weekNumber/:dataType', (req, res) => {
         const db = admin.database();
         const ref = db.ref();
         const {
@@ -110,7 +114,9 @@ function capitalizeFirstLetter(string) {
             body += chunk.toString();
         });
         req.on('end', () => {
-            switch (dataType) {
+            const responseBody = { body };
+            console.log(JSON.parse(body));
+            /*switch (dataType) {
                 case 'schedules': {
                     const weekRef = ref.child(
                         `${basePath}schedules/${weekType}/${weekNumber}`
@@ -154,13 +160,13 @@ function capitalizeFirstLetter(string) {
                 }
             }
 
-            res.sendStatus(200);
+            res.sendStatus(200);*/
         });
     }
-);*/
+);
 
 // ROSTERS
-/*app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
+app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     const {
@@ -171,7 +177,9 @@ function capitalizeFirstLetter(string) {
         body += chunk.toString();
     });
     req.on('end', () => {
-        const { rosterInfoList } = JSON.parse(body);
+        const responseBody = { body };
+        console.log(JSON.parse(body));
+        /*const { rosterInfoList } = JSON.parse(body);
         const dataRef = ref.child(
             `data/${username}/${leagueId}/freeagents`
         );
@@ -186,11 +194,11 @@ function capitalizeFirstLetter(string) {
                 console.log('Data saved successfully.');
             }
         });
-        res.sendStatus(200);
+        res.sendStatus(200);*/
     });
-});*/
+});
 
-/*app.post('/:username/:platform/:leagueId/team/:teamId/roster', (req, res) => {
+app.post('/:username/:platform/:leagueId/team/:teamId/roster', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     const {
@@ -201,7 +209,9 @@ function capitalizeFirstLetter(string) {
         body += chunk.toString();
     });
     req.on('end', () => {
-        const { rosterInfoList } = JSON.parse(body);
+        const responseBody = { body };
+        console.log(JSON.parse(body));
+        /*const { rosterInfoList } = JSON.parse(body);
         const dataRef = ref.child(
             `data/${username}/${leagueId}/teams/${teamId}/roster`
         );
@@ -216,9 +226,9 @@ function capitalizeFirstLetter(string) {
                 console.log('Data saved successfully.');
             }
         });
-        res.sendStatus(200);
+        res.sendStatus(200);*/
     });
-});*/
+});
 
 app.listen(app.get('port'), () =>
     console.log('Madden Data is running on port', app.get('port'))
