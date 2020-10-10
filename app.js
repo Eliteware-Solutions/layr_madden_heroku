@@ -59,6 +59,7 @@ app.post('/:username/:platform/:leagueId/leagueteams', (req, res) => {
     });
     req.on('end', () => {
         const responseBody = { body };
+        console.log("LeagueTeams");
         console.log(JSON.parse(body));
         const { leagueTeamInfoList: teams } = JSON.parse(body);
         const {params: { username, leagueId }} = req;
@@ -81,6 +82,7 @@ app.post('/:username/:platform/:leagueId/standings', (req, res) => {
     });
     req.on('end', () => {
         const responseBody = { body };
+        console.log("Standings");
         console.log(JSON.parse(body));
         const { teamStandingInfoList: teams } = JSON.parse(body);
         const {params: { username, leagueId }} = req;
@@ -115,6 +117,7 @@ app.post('/:username/:platform/:leagueId/week/:weekType/:weekNumber/:dataType', 
         });
         req.on('end', () => {
             const responseBody = { body };
+            console.log("PlayerStats");
             console.log(JSON.parse(body));
             switch (dataType) {
                 case 'schedules': {
@@ -178,6 +181,7 @@ app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
     });
     req.on('end', () => {
         const responseBody = { body };
+        console.log("Roaster");
         console.log(JSON.parse(body));
         const { rosterInfoList } = JSON.parse(body);
         const dataRef = ref.child(
