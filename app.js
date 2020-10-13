@@ -235,30 +235,15 @@ app.post('/:groupuniqueid/:platform/:leagueId/team/:teamId/roster', (req, res) =
 
 //get all users
 app.get('*', async (req, res) => {
-    //const exportDataSnap = await db.collection(exportData).get();
-    //const users: any[] = [];
     const db = admin.database();
-    const ref = db.ref(`exportData`);
-    //const users = await db.collection('exportData').get();
-    //const exportDataref = ref.child(`exportData`);
-    //const a = exportDataref.get();
-    ref.once("value").then(function(snapshot) {
-        console.log(snapshot.child("er7ez"));
-        //var name = snapshot.child("name").val(); // {first:"Ada",last:"Lovelace"}
-        //var firstName = snapshot.child("name/first").val(); // "Ada"
-        //var lastName = snapshot.child("name").child("last").val(); // "Lovelace"
-        //var age = snapshot.child("age").val(); // null
+    //const ref = db.ref(`data`);
+    var ref = db.ref("exportData/er7ez/3366872");
+    ref.once("value")
+    .then(function(snapshot) {
+        var key = snapshot.key; // "ada"
+        var childKey = snapshot.child("teams").val(); // "last"
+        res.send(childKey);
     });
-    // console.log(exportDataref);
-    return false;
-    /*exportDataSnap.forEach((doc)=>{
-            users.push({
-                id: doc.id,
-                data:doc.data()
-            });
-        }
-    );*/
-    //res.status(200).json(query);
 });
 
 app.listen(app.get('port'), () =>
