@@ -22,9 +22,9 @@ admin.initializeApp({
 
 app.set('port', (process.env.PORT || 3001));
 
-app.get('*', (req, res) => {
+/*app.get('*', (req, res) => {
     res.send('Madden Companion Exporter');
-});
+});*/
 
 // res.write(JSON.stringify(JSON.parse(body)));
 // res.end();
@@ -39,6 +39,11 @@ app.post('/:groupuniqueid/:platform/:leagueId/leagueteams', (req, res) => {
     req.on('end', () => {
         const { leagueTeamInfoList: teams } = JSON.parse(body);
         const {params: { groupuniqueid, leagueId }} = req;
+
+        /* Store loading flag in FireBase */
+        const loadingRef = ref.child(`exportData/${groupuniqueid}/${leagueId}`);
+        loadingRef.update({'loading': "false"});
+
         teams.forEach(team => {
             const teamRef = ref.child(`exportData/${groupuniqueid}/${leagueId}/leagueTeams/${team.teamId}`);
             teamRef.update(team);
@@ -57,13 +62,24 @@ app.post('/:groupuniqueid/:platform/:leagueId/standings', (req, res) => {
     req.on('end', () => {
         const { teamStandingInfoList: teams } = JSON.parse(body);
         const {params: { groupuniqueid, leagueId }} = req;
+        let calendarYear = "";
+        /* Store loading flag in FireBase */
+        const loadingRef = ref.child(`exportData/${groupuniqueid}/${leagueId}`);
+        loadingRef.update({'loading': "false"});
 
         teams.forEach(team => {
+            if (calendarYear != "") {
+                calendarYear = team.calendarYear;
+            }
             const standingRef = ref.child(`exportData/${groupuniqueid}/${leagueId}/standings/${team.calendarYear}/${team.teamId}`);
             const teamRef = ref.child(`exportData/${groupuniqueid}/${leagueId}/teams/${team.teamId}`);
             standingRef.update(team);
             teamRef.set(team);
         });
+        /* Store Calendar Year in FireBase */
+        const calYearRef = ref.child(`exportData/${groupuniqueid}/${leagueId}`);
+        calYearRef.update({'calendarYear': calendarYear});
+
         res.sendStatus(200);
     });
 });
@@ -104,9 +120,15 @@ app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataTy
                     weekTypeNumber = "superbowl";
                 }
             }
-            /*const { curWeekIdx } = weekTypeNumber;
-            const curWeekIdxRef = ref.child(`exportData/${groupuniqueid}/${leagueId}/currentWeekIndex`);
-            curWeekIdxRef.update(curWeekIdx);*/
+
+            /* Store Current Week Index in FireBase */
+            const curWeekIdxRef = ref.child(`exportData/${groupuniqueid}/${leagueId}`);
+            curWeekIdxRef.update({'currentWeekIndex': weekTypeNumber});
+
+            /* Store loading flag in FireBase */
+            const loadingRef = ref.child(`exportData/${groupuniqueid}/${leagueId}`);
+            loadingRef.update({'loading': "false"});
+
             switch (dataType) {
                 case 'schedules': {
                     const { gameScheduleInfoList: schedules } = JSON.parse(body);
@@ -114,15 +136,11 @@ app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataTy
                         const scheduleRef = ref.child(`${basePath}schedules/${weekTypeName}/${weekTypeNumber}/${schedule.scheduleId}`);
                         scheduleRef.set(schedule);
                     });
-                    /*const weekRef = ref.child(`${basePath}schedules/${weekType}/${weekNumber}`);
-                    const { gameScheduleInfoList: schedules } = JSON.parse(body);
-                    weekRef.update(schedules);*/
                     break;
                 }
                 case 'teamstats': {
                     const { teamStatInfoList: teamStats } = JSON.parse(body);
                     teamStats.forEach(stat => {
-                        //const weekRef = ref.child(`${statsPath}/${weekType}/${weekNumber}/${stat.teamId}/team-stats`);
                         const teamStatsRef = ref.child(`${basePath}schedules/${weekTypeName}/${weekTypeNumber}/${stat.scheduleId}/playerTeamstatsData`);
                         teamStatsRef.set(stat);
                     });
@@ -131,7 +149,6 @@ app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataTy
                 case 'defense': {
                     const { playerDefensiveStatInfoList: defensiveStats } = JSON.parse(body);
                     defensiveStats.forEach(stat => {
-                        //const weekRef = ref.child(`${statsPath}/${weekType}/${weekNumber}/${stat.teamId}/player-stats/${stat.rosterId}`);
                         const teamStatsRef = ref.child(`${basePath}schedules/${weekTypeName}/${weekTypeNumber}/${stat.scheduleId}/playerDefenseData`);
                         teamStatsRef.set(stat);
                     });
@@ -142,7 +159,6 @@ app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataTy
                     const nodeProperty = `player${capitalizeFirstLetter(dataType)}Data`;
                     const stats = JSON.parse(body)[property];
                     stats.forEach(stat => {
-                        //const weekRef = ref.child(`${statsPath}/${weekType}/${weekNumber}/${stat.teamId}/player-stats/${stat.rosterId}`);
                         const teamStatsRef = ref.child(`${basePath}schedules/${weekTypeName}/${weekTypeNumber}/${stat.scheduleId}/${nodeProperty}`);
                         teamStatsRef.set(stat);
                     });
@@ -156,7 +172,7 @@ app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataTy
 );
 
 // ROSTERS
-app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
+/*app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     const {
@@ -168,9 +184,40 @@ app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
     });
     req.on('end', () => {
         const { rosterInfoList } = JSON.parse(body);
-        const dataRef = ref.child(
-            `data/${username}/${leagueId}/freeagents`
-        );
+        const dataRef = ref.child(`data/${username}/${leagueId}/freeagents`);
+        const players = {};
+        rosterInfoList.forEach(player => {
+            players[player.rosterId] = player;
+        });
+        dataRef.set(players, error => {
+            if (error) {
+                console.log('Data could not be saved.' + error);
+            } else {
+                console.log('Data saved successfully.');
+            }
+        });
+        res.sendStatus(200);
+    });
+});*/
+
+app.post('/:groupuniqueid/:platform/:leagueId/team/:teamId/roster', (req, res) => {
+    const db = admin.database();
+    const ref = db.ref();
+    const {
+        params: { groupuniqueid, leagueId, teamId }
+    } = req;
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        const { rosterInfoList } = JSON.parse(body);
+        const dataRef = ref.child(`exportData/${groupuniqueid}/${leagueId}/teams/${teamId}/rosters`);
+
+        /* Store loading flag in FireBase */
+        const loadingRef = ref.child(`exportData/${groupuniqueid}/${leagueId}`);
+        loadingRef.update({'loading': "false"});
+
         const players = {};
         rosterInfoList.forEach(player => {
             players[player.rosterId] = player;
@@ -186,32 +233,32 @@ app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
     });
 });
 
-app.post('/:groupuniqueid/:platform/:leagueId/team/:teamId/roster', (req, res) => {
+//get all users
+app.get('*', async (req, res) => {
+    //const exportDataSnap = await db.collection(exportData).get();
+    //const users: any[] = [];
     const db = admin.database();
-    const ref = db.ref();
-    const {
-        params: { groupuniqueid, leagueId, teamId }
-    } = req;
-    let body = '';
-    req.on('data', chunk => {
-        body += chunk.toString();
+    const ref = db.ref(`exportData`);
+    //const users = await db.collection('exportData').get();
+    //const exportDataref = ref.child(`exportData`);
+    //const a = exportDataref.get();
+    ref.once("value").then(function(snapshot) {
+        console.log(snapshot.child("er7ez"));
+        //var name = snapshot.child("name").val(); // {first:"Ada",last:"Lovelace"}
+        //var firstName = snapshot.child("name/first").val(); // "Ada"
+        //var lastName = snapshot.child("name").child("last").val(); // "Lovelace"
+        //var age = snapshot.child("age").val(); // null
     });
-    req.on('end', () => {
-        const { rosterInfoList } = JSON.parse(body);
-        const dataRef = ref.child(`exportData/${groupuniqueid}/${leagueId}/teams/${teamId}/rosters`);
-        const players = {};
-        rosterInfoList.forEach(player => {
-            players[player.rosterId] = player;
-        });
-        dataRef.set(players, error => {
-            if (error) {
-                console.log('Data could not be saved.' + error);
-            } else {
-                console.log('Data saved successfully.');
-            }
-        });
-        res.sendStatus(200);
-    });
+    // console.log(exportDataref);
+    return false;
+    /*exportDataSnap.forEach((doc)=>{
+            users.push({
+                id: doc.id,
+                data:doc.data()
+            });
+        }
+    );*/
+    //res.status(200).json(query);
 });
 
 app.listen(app.get('port'), () =>
