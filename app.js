@@ -254,6 +254,7 @@ app.get('/export_data', async (req, res) => {
                 var childData = childValue.val();
                 calendarYear = childData.calendarYear;
                 var teams = childData.teams;
+                var schedules = childData.schedules;
 
                 // =============== Arrange Standings Team data ===============
                 var standings = childData.standings[calendarYear];
@@ -263,13 +264,20 @@ app.get('/export_data', async (req, res) => {
                     value.teamLogo = teamLogoUrl;
                     standingTeam[key] = Object.assign(standings[key], value);
                 }
-                const standingRef = refChange.child(`exportData/${groupkey}/${leaguekey}/standings/${calendarYear}`);
-                standingRef.set(standingTeam);
+                //const standingRef = refChange.child(`exportData/${groupkey}/${leaguekey}/standings/${calendarYear}`);
+                //standingRef.set(standingTeam);
                 // =============== Ends ===============
+
                 // =============== Arrange Team data ===============
-                const teamRef = refChange.child(`exportData/${groupkey}/${leaguekey}/teams`);
-                teamRef.set(teams);
+                //const teamRef = refChange.child(`exportData/${groupkey}/${leaguekey}/teams`);
+                //teamRef.set(teams);
                 // =============== Ends ===============
+                //console.log(schedules);
+                for(let [key, value] of Object.entries(schedules.post)){
+                    console.log(key);
+                    console.log(value.conference);
+                    return false;
+                }
             });
 
             obj[groupkey] = childSnapshot.val();
