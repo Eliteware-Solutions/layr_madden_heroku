@@ -234,15 +234,49 @@ app.post('/:groupuniqueid/:platform/:leagueId/team/:teamId/roster', (req, res) =
 });
 
 //get all users
-app.get('*', async (req, res) => {
+app.get('/export_data', async (req, res) => {
+    let tempExportAry = [];
+    let tempGroupAry = [];
+    let tempGameAry = [];
     const db = admin.database();
-    //const ref = db.ref(`data`);
-    var ref = db.ref("exportData/er7ez/3366872");
-    ref.once("value")
-    .then(function(snapshot) {
-        var key = snapshot.key; // "ada"
-        var childKey = snapshot.child("teams").val(); // "last"
-        res.send(childKey);
+    const refChange = db.ref(); // Update Arrange data
+    const refExport = db.ref("exportData"); // Get to Arrange
+    refExport.once("value").then(function(snapshot) {
+        snapshot.forEach(function (childSnapshot) {
+            var obj = {};
+            var groupkey = childSnapshot.key;
+            var calendarYear = "";
+
+            childSnapshot.forEach(function (childValue) {
+                let standingTeam = {};
+                tempGameAry.push(childValue.key);
+                var leaguekey = childValue.key;
+                var childData = childValue.val();
+                calendarYear = childData.calendarYear;
+                var teams = childData.teams;
+
+                // =============== Arrange Standings Team data ===============
+                var standings = childData.standings[calendarYear];
+                for(let [key, value] of Object.entries(childData.leagueTeams)){
+                    var teamLogoUrl = "asset/nfl_team_logos/"+value.displayName.toLowerCase();
+                    teams[key]['logo'] = teamLogoUrl;
+                    value.teamLogo = teamLogoUrl;
+                    standingTeam[key] = Object.assign(standings[key], value);
+                }
+                const standingRef = refChange.child(`exportData/${groupkey}/${leaguekey}/standings/${calendarYear}`);
+                standingRef.set(standingTeam);
+                // =============== Ends ===============
+                // =============== Arrange Team data ===============
+                const teamRef = refChange.child(`exportData/${groupkey}/${leaguekey}/teams`);
+                teamRef.set(teams);
+                // =============== Ends ===============
+            });
+
+            obj[groupkey] = childSnapshot.val();
+            tempExportAry.push(obj);
+            tempGroupAry.push(groupkey);
+        });
+        // res.send(tempExportAry);
     });
 });
 
