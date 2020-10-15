@@ -1,5 +1,8 @@
 const express = require('express');
 const admin = require('firebase-admin');
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+const getDirName = require('path').dirname;
 
 const app = express();
 
@@ -28,6 +31,47 @@ app.set('port', (process.env.PORT || 3001));
 
 // res.write(JSON.stringify(JSON.parse(body)));
 // res.end();
+
+app.post('/create_file/:groupid/:platform/:leagueId/*', (req, res) => {
+    const db = admin.database();
+    const ref = db.ref();
+    const originalUrl = req.originalUrl;
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {
+        const {params: { groupid, leagueId }} = req;
+        const UrlAry = originalUrl.split(`${leagueId}/`);
+        const pageAry = UrlAry[1].split('/');
+        const pageName = pageAry[pageAry.length - 1];
+        const pageIndex = pageAry.indexOf(pageName);
+        let path = "madden";
+        if (!fs.existsSync(path)){
+            fs.mkdirSync(path);
+        }
+        if (!fs.existsSync("madden")){
+            fs.mkdirSync("madden");
+        }
+        if (pageIndex > -1) {
+            pageAry.splice(pageIndex, 1);
+            for(var i=0; i < pageAry.length; i++) {
+                if (!fs.existsSync(pageAry[i])){
+                    fs.mkdirSync(pageAry[i]);
+                }
+            }
+        }
+        const pagePath = `madden/${leagueId}/`+pageAry.join("/");
+
+        //let newexport= `||${leagueId}-${groupid}`;
+        //fs.writeFileSync('madden/export.txt', newexport);
+        /*if (!fs.existsSync("madden/week")){
+            fs.mkdirSync("madden/week");
+        }*/
+
+        res.sendStatus(200);
+    });
+});
 
 app.post('/:groupuniqueid/:platform/:leagueId/leagueteams', (req, res) => {
     const db = admin.database();
@@ -141,7 +185,7 @@ app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataTy
                 case 'teamstats': {
                     const { teamStatInfoList: teamStats } = JSON.parse(body);
                     teamStats.forEach(stat => {
-                        const teamStatsRef = ref.child(`${basePath}schedules/${weekTypeName}/${weekTypeNumber}/${stat.scheduleId}/playerTeamstatsData`);
+                        const teamStatsRef = ref.child(`${basePath}schedules/${weekTypeName}/${weekTypeNumber}/${stat.scheduleId}/playerTeamstatsData/${stat.teamId}`);
                         teamStatsRef.set(stat);
                     });
                     break;
@@ -149,7 +193,7 @@ app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataTy
                 case 'defense': {
                     const { playerDefensiveStatInfoList: defensiveStats } = JSON.parse(body);
                     defensiveStats.forEach(stat => {
-                        const teamStatsRef = ref.child(`${basePath}schedules/${weekTypeName}/${weekTypeNumber}/${stat.scheduleId}/playerDefenseData`);
+                        const teamStatsRef = ref.child(`${basePath}schedules/${weekTypeName}/${weekTypeNumber}/${stat.scheduleId}/playerDefenseData/${stat.rosterId}`);
                         teamStatsRef.set(stat);
                     });
                     break;
@@ -159,8 +203,8 @@ app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataTy
                     const nodeProperty = `player${capitalizeFirstLetter(dataType)}Data`;
                     const stats = JSON.parse(body)[property];
                     stats.forEach(stat => {
-                        const teamStatsRef = ref.child(`${basePath}schedules/${weekTypeName}/${weekTypeNumber}/${stat.scheduleId}/${nodeProperty}`);
-                        teamStatsRef.set(stat);
+                        const teamOtherRef = ref.child(`${basePath}schedules/${weekTypeName}/${weekTypeNumber}/${stat.scheduleId}/${nodeProperty}/${stat.rosterId}`);
+                        teamOtherRef.set(stat);
                     });
                     break;
                 }
@@ -276,7 +320,7 @@ app.get('/export_data', async (req, res) => {
             tempExportAry.push(obj);
             tempGroupAry.push(groupkey);
         });
-        // res.send(tempExportAry);
+        res.send(tempExportAry);
     });
 });
 

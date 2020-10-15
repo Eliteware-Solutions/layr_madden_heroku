@@ -22,6 +22,8 @@
     <list default="true" id="7e582986-8bd5-42ce-9762-fa649fcfff9a" name="Default Changelist" comment="Test">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -83,6 +85,11 @@
       <workItem from="1602522805329" duration="85000" />
       <workItem from="1602600806834" duration="3402000" />
       <workItem from="1602652291588" duration="20485000" />
+      <workItem from="1602683353197" duration="145000" />
+      <workItem from="1602737669861" duration="18274000" />
+      <workItem from="1602761864225" duration="187000" />
+      <workItem from="1602762083914" duration="254000" />
+      <workItem from="1602762367893" duration="4163000" />
     </task>
     <task id="LOCAL-00001" summary="Test">
       <created>1602600908606</created>
@@ -91,7 +98,14 @@
       <option name="project" value="LOCAL" />
       <updated>1602600908606</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Test">
+      <created>1602683411048</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1602683411048</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
