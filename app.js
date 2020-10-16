@@ -38,6 +38,8 @@ app.post('/:groupid/:platform/:leagueId/*', (req, res) => {
     req.on('data', chunk => {
         body += chunk.toString();
     });
+    console.log(originalUrl);
+    console.log(body);
     req.on('end', () => {
         const {params: { groupid, leagueId }} = req;
         const UrlAry = originalUrl.split(`${leagueId}/`);
@@ -76,13 +78,8 @@ app.post('/:groupid/:platform/:leagueId/*', (req, res) => {
                 }
             });
         } else {
-            //fs.writeFileSync('madden/export.txt', newexport);
-            fs.writeFileSync('export.txt', newexport);
+            fs.writeFileSync('madden/export.txt', newexport);
         }
-        fs.writeFileSync(__dirname+'/export.txt', newexport, function (err, data) {
-            console.log(err);
-            console.log(data);
-        });
         // ============================ Ends ============================
 
         fs.writeFileSync(`${path}/${pageName}.json`, body); // Create dynamic files as per folders
