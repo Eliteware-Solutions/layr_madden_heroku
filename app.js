@@ -47,12 +47,11 @@ app.post('/:groupid/:platform/:leagueId/*', (req, res) => {
         let calendarYear = "";
 
         // ============================ To make Folder Structure ============================
-        let path = "madden";
+        let path = __dirname+"madden";
         if (!fs.existsSync(path)) fs.mkdirSync(path); // Check and create madden folder
         path = `${path}/${leagueId}`;
-        console.log(path);
         if (!fs.existsSync(path)) fs.mkdirSync(path); // Check and create madden/GameId folder
-        return true;
+
         if (pageIndex > -1) {
             pageAry.splice(pageIndex, 1);
             for(var i=0; i < pageAry.length; i++) {
