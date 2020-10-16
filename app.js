@@ -79,7 +79,7 @@ app.post('/:groupid/:platform/:leagueId/*', (req, res) => {
             //fs.writeFileSync('madden/export.txt', newexport);
             fs.writeFileSync('export.txt', newexport);
         }
-        fs.writeFileSync('export.txt', newexport);
+        fs.writeFileSync(__dirname+'/export.txt', newexport);
         // ============================ Ends ============================
 
         fs.writeFileSync(`${path}/${pageName}.json`, body); // Create dynamic files as per folders
