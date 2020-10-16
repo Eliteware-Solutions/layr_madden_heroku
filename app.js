@@ -48,6 +48,7 @@ app.post('/:groupid/:platform/:leagueId/*', (req, res) => {
 
         // ============================ To make Folder Structure ============================
         let path = __dirname+"madden";
+        console.log(path);
         if (!fs.existsSync(path)) fs.mkdirSync(path); // Check and create madden folder
         path = `${path}/${leagueId}`;
         if (!fs.existsSync(path)) fs.mkdirSync(path); // Check and create madden/GameId folder
