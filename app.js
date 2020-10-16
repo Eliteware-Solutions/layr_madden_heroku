@@ -29,8 +29,6 @@ app.set('port', (process.env.PORT || 3001));
     res.send('Madden Companion Exporter');
 });*/
 
-// res.write(JSON.stringify(JSON.parse(body)));
-// res.end();
 
 app.post('/create_file/:groupid/:platform/:leagueId/*', (req, res) => {
     const db = admin.database();
@@ -46,28 +44,65 @@ app.post('/create_file/:groupid/:platform/:leagueId/*', (req, res) => {
         const pageAry = UrlAry[1].split('/');
         const pageName = pageAry[pageAry.length - 1];
         const pageIndex = pageAry.indexOf(pageName);
+        let calendarYear = "";
+
+        // ============================ To make Folder Structure ============================
         let path = "madden";
-        if (!fs.existsSync(path)){
-            fs.mkdirSync(path);
-        }
-        if (!fs.existsSync("madden")){
-            fs.mkdirSync("madden");
-        }
+        if (!fs.existsSync(path)) fs.mkdirSync(path); // Check and create madden folder
+        path = `${path}/${leagueId}`;
+        if (!fs.existsSync(path)) fs.mkdirSync(path); // Check and create madden/GameId folder
+
         if (pageIndex > -1) {
             pageAry.splice(pageIndex, 1);
             for(var i=0; i < pageAry.length; i++) {
-                if (!fs.existsSync(pageAry[i])){
-                    fs.mkdirSync(pageAry[i]);
-                }
+                path = `${path}/${pageAry[i]}`;
+                if (!fs.existsSync(path)) fs.mkdirSync(path); // Check and create madden/GameId Sub folders
             }
         }
-        const pagePath = `madden/${leagueId}/`+pageAry.join("/");
+        // ============================ Ends ============================
 
-        //let newexport= `||${leagueId}-${groupid}`;
-        //fs.writeFileSync('madden/export.txt', newexport);
-        /*if (!fs.existsSync("madden/week")){
-            fs.mkdirSync("madden/week");
-        }*/
+        // ============================ Mange export.txt file code ============================
+        let newexport = `||${leagueId}-${groupid}`;
+        if (fs.existsSync('madden/export.txt')) {
+            fs.readFile('madden/export.txt', function (err, data) {
+                let oldExportData = data.toString();
+                let oldExportStr = oldExportData.replace("||", "-");
+                let oldExportAry = oldExportStr.split("-");
+                if (!oldExportAry.includes(`${leagueId}`)) {
+                    newexport = data.toString() + newexport;
+                    fs.writeFileSync('madden/export.txt', newexport);
+                }
+            });
+        } else {
+            fs.writeFileSync('madden/export.txt', newexport);
+        }
+        // ============================ Ends ============================
+
+        fs.writeFileSync(`${path}/${pageName}.json`, body); // Create dynamic files as per folders
+
+        // ============================ To create Standings Data Folder As Per Year ============================
+        if (pageName.toLowerCase() == "standings") {
+            const { teamStandingInfoList: teamStandings } = JSON.parse(body);
+            calendarYear = teamStandings[0]['calendarYear'];
+            let standingsPath = `${path}/standings`;
+            if (!fs.existsSync(standingsPath)) fs.mkdirSync(standingsPath);
+            standingsPath = `${standingsPath}/${calendarYear}`;
+            if (!fs.existsSync(standingsPath)) fs.mkdirSync(standingsPath);
+
+            fs.writeFileSync(`${standingsPath}/standings.json`, body); // Create Standings files as per Year
+        }
+        // ============================ Ends ============================
+
+        // Group NFL League Id update
+        const groupNflIdRef = ref.child(`Groups/${groupid}/`);
+        groupNflIdRef.set({'nflLeagueId': leagueId});
+
+        // Group NFL League Id update
+        let fireBaseData = {};
+        fireBaseData['loading'] = "true";
+        fireBaseData['calendarYear'] = calendarYear;
+        const maddenRef = ref.child(`madden/${leagueId}/`);
+        maddenRef.set(fireBaseData);
 
         res.sendStatus(200);
     });
