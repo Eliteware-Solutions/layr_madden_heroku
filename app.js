@@ -30,7 +30,7 @@ app.set('port', (process.env.PORT || 3001));
 });*/
 
 
-app.post('/create_file/:groupid/:platform/:leagueId/*', (req, res) => {
+app.post('/:groupid/:platform/:leagueId/*', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     const originalUrl = req.originalUrl;
@@ -94,21 +94,43 @@ app.post('/create_file/:groupid/:platform/:leagueId/*', (req, res) => {
         // ============================ Ends ============================
 
         // Group NFL League Id update
-        const groupNflIdRef = ref.child(`Groups/${groupid}/`);
+        const groupNflIdRef = ref.child(`Groups/${groupid}`);
         groupNflIdRef.set({'nflLeagueId': leagueId});
 
         // Group NFL League Id update
         let fireBaseData = {};
         fireBaseData['loading'] = "true";
         fireBaseData['calendarYear'] = calendarYear;
-        const maddenRef = ref.child(`madden/${leagueId}/`);
+        const maddenRef = ref.child(`madden/${leagueId}`);
         maddenRef.set(fireBaseData);
 
         res.sendStatus(200);
     });
 });
 
-app.post('/:groupuniqueid/:platform/:leagueId/leagueteams', (req, res) => {
+app.post('/arrange_data', (req, res) => {
+    const exportFile = 'madden/export.txt';
+    if (fs.existsSync(exportFile)) {
+        fs.readFile(exportFile, function (err, data) {
+            let exportIds = data.toString().split("||");
+            exportIds.splice(0, 1);
+            if (exportIds != "" && exportIds != undefined && exportIds != null) {
+                for(let i=0; i<exportIds.length; i++) {
+                    let exportAry = exportIds[i].split("-");
+                    let gameId = exportAry[0];
+                    let groupUniqueId = exportAry[1];
+                    let rosterData = {};
+                    let leagueFilePath = `madden/${gameId}/leagueteams.json`;
+                    fs.readFile(leagueFilePath, function (err, data) {
+                        const { leagueTeamInfoList: leagueTeams } = JSON.parse(data);
+                    });
+                }
+            }
+        });
+    }
+});
+
+/*app.post('/:groupuniqueid/:platform/:leagueId/leagueteams', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     let body = '';
@@ -119,7 +141,7 @@ app.post('/:groupuniqueid/:platform/:leagueId/leagueteams', (req, res) => {
         const { leagueTeamInfoList: teams } = JSON.parse(body);
         const {params: { groupuniqueid, leagueId }} = req;
 
-        /* Store loading flag in FireBase */
+        // Store loading flag in FireBase
         const loadingRef = ref.child(`exportData/${groupuniqueid}/${leagueId}`);
         loadingRef.update({'loading': "false"});
 
@@ -129,9 +151,9 @@ app.post('/:groupuniqueid/:platform/:leagueId/leagueteams', (req, res) => {
         });
         res.sendStatus(200);
     });
-});
+});*/
 
-app.post('/:groupuniqueid/:platform/:leagueId/standings', (req, res) => {
+/*app.post('/:groupuniqueid/:platform/:leagueId/standings', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     let body = '';
@@ -142,7 +164,7 @@ app.post('/:groupuniqueid/:platform/:leagueId/standings', (req, res) => {
         const { teamStandingInfoList: teams } = JSON.parse(body);
         const {params: { groupuniqueid, leagueId }} = req;
         let calendarYear = "";
-        /* Store loading flag in FireBase */
+        // Store loading flag in FireBase
         const loadingRef = ref.child(`exportData/${groupuniqueid}/${leagueId}`);
         loadingRef.update({'loading': "false"});
 
@@ -155,19 +177,18 @@ app.post('/:groupuniqueid/:platform/:leagueId/standings', (req, res) => {
             standingRef.update(team);
             teamRef.set(team);
         });
-        /* Store Calendar Year in FireBase */
+        // Store Calendar Year in FireBase
         const calYearRef = ref.child(`exportData/${groupuniqueid}/${leagueId}`);
         calYearRef.update({'calendarYear': calendarYear});
-
         res.sendStatus(200);
     });
-});
+});*/
 
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataType', (req, res) => {
+/*app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataType', (req, res) => {
         const db = admin.database();
         const ref = db.ref();
         const {params: { groupuniqueid, leagueId, weekType, weekNumber, dataType },} = req;
@@ -200,11 +221,11 @@ app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataTy
                 }
             }
 
-            /* Store Current Week Index in FireBase */
+            // Store Current Week Index in FireBase
             const curWeekIdxRef = ref.child(`exportData/${groupuniqueid}/${leagueId}`);
             curWeekIdxRef.update({'currentWeekIndex': weekTypeNumber});
 
-            /* Store loading flag in FireBase */
+            // Store loading flag in FireBase
             const loadingRef = ref.child(`exportData/${groupuniqueid}/${leagueId}`);
             loadingRef.update({'loading': "false"});
 
@@ -248,7 +269,7 @@ app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataTy
             res.sendStatus(200);
         });
     }
-);
+);*/
 
 // ROSTERS
 /*app.post('/:username/:platform/:leagueId/freeagents/roster', (req, res) => {
@@ -279,7 +300,7 @@ app.post('/:groupuniqueid/:platform/:leagueId/week/:weekType/:weekNumber/:dataTy
     });
 });*/
 
-app.post('/:groupuniqueid/:platform/:leagueId/team/:teamId/roster', (req, res) => {
+/*app.post('/:groupuniqueid/:platform/:leagueId/team/:teamId/roster', (req, res) => {
     const db = admin.database();
     const ref = db.ref();
     const {
@@ -293,7 +314,7 @@ app.post('/:groupuniqueid/:platform/:leagueId/team/:teamId/roster', (req, res) =
         const { rosterInfoList } = JSON.parse(body);
         const dataRef = ref.child(`exportData/${groupuniqueid}/${leagueId}/teams/${teamId}/rosters`);
 
-        /* Store loading flag in FireBase */
+        // Store loading flag in FireBase
         const loadingRef = ref.child(`exportData/${groupuniqueid}/${leagueId}`);
         loadingRef.update({'loading': "false"});
 
@@ -310,10 +331,10 @@ app.post('/:groupuniqueid/:platform/:leagueId/team/:teamId/roster', (req, res) =
         });
         res.sendStatus(200);
     });
-});
+});*/
 
 //get all users
-app.get('/export_data', async (req, res) => {
+/*app.get('/export_data', async (req, res) => {
     let tempExportAry = [];
     let tempGroupAry = [];
     let tempGameAry = [];
@@ -351,11 +372,8 @@ app.get('/export_data', async (req, res) => {
                 //const teamRef = refChange.child(`exportData/${groupkey}/${leaguekey}/teams`);
                 //teamRef.set(teams);
                 // =============== Ends ===============
-                //console.log(schedules);
                 for(let [key, value] of Object.entries(schedules.post)){
-                    console.log(key);
-                    console.log(value.conference);
-                    return false;
+
                 }
             });
 
@@ -365,7 +383,7 @@ app.get('/export_data', async (req, res) => {
         });
         res.send(tempExportAry);
     });
-});
+});*/
 
 app.listen(app.get('port'), () =>
     console.log('Madden Data is running on port', app.get('port'))
