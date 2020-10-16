@@ -38,7 +38,6 @@ app.post('/:groupid/:platform/:leagueId/*', (req, res) => {
     req.on('data', chunk => {
         body += chunk.toString();
     });
-    console.log(originalUrl);
     console.log(body);
     req.on('end', () => {
         const {params: { groupid, leagueId }} = req;
